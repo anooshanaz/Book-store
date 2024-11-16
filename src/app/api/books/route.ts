@@ -1,7 +1,15 @@
 import { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
-  const Books = [
+export type Book = {
+  id: number;
+  title: string;
+  desc: string;
+  author: string;
+  available: boolean;
+  image: string;
+};
+const books: Book[] =[
     {
       id: 1,
       title: "The Catalyzer",
@@ -124,16 +132,58 @@ import { NextResponse } from "next/server";
       },
     ]
 
-export async function GET() {
-    try{
-        return NextResponse.json(Books ,{status: 200})
-    }catch(error){
-        return NextResponse.json(
-            {message: "Error fetching books"},
-            { status: 500}
-        )
-    }
-    
+export function getBooks(): Book[] {
+  return books;
 }
 
-  
+export async function GET() {
+  return NextResponse.json(books);
+}
+
+export async function POST(request: NextRequest) {
+  try {
+    const newBook: Book = await request.json();
+    books.push(newBook);
+    return NextResponse.json({ message: "Book added successfully", book: newBook }, { status: 201 });
+  } catch (error) {
+    return NextResponse.json({ message: `Failed to add book: ${error}` }, { status: 500 });
+  }
+}
+
+export async function PUT(request: NextRequest) {
+  try {
+    const updatedBook: Partial<Book> = await request.json();
+    const bookIndex = books.findIndex(book => book.id === updatedBook.id);
+
+    if (bookIndex === -1) {
+      return NextResponse.json({ message: "Book not found" }, { status: 404 });
+    }
+
+    books[bookIndex] = { ...books[bookIndex], ...updatedBook };
+    return NextResponse.json({ message: "Book updated successfully", book: books[bookIndex] });
+  } catch (error) {
+    return NextResponse.json({ message: `Failed to update book: ${error}` }, { status: 500 });
+  }
+}
+
+export async function DELETE(request: NextRequest) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get('id');
+
+    if (!id) {
+      return NextResponse.json({ message: "Book ID is required" }, { status: 400 });
+    }
+
+    const bookIndex = books.findIndex(book => book.id === parseInt(id));
+
+    if (bookIndex === -1) {
+      return NextResponse.json({ message: "Book not found" }, { status: 404 });
+    }
+
+    const deletedBook = books.splice(bookIndex, 1)[0];
+    return NextResponse.json({ message: "Book deleted successfully", book: deletedBook });
+  } catch (error) {
+    return NextResponse.json({ message: `Failed to delete book: ${error}` }, { status: 500 });
+  }
+}
