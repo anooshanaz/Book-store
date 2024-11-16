@@ -1,17 +1,7 @@
 import { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
-
-export type Book = {
-    id: number;
-    title: string;
-    desc: string;
-    author: string;
-    available: boolean;
-    image: string;
-  };
-
-  const books: Book[] = [
+  const Books = [
     {
       id: 1,
       title: "The Catalyzer",
@@ -135,13 +125,15 @@ export type Book = {
     ]
 
 export async function GET() {
-  try {
-    const newBook: Book = await request.json();
-    books.push(newBook);
-    return NextResponse.json({ message: "Book added successfully", book: newBook }, { status: 201 });
-  } catch (error) {
-    return NextResponse.json({ message: `Failed to add book: ${error}` }, { status: 500 });
-  }
+    try{
+        return NextResponse.json(Books ,{status: 200})
+    }catch(error){
+        return NextResponse.json(
+            {message: "Error fetching books"},
+            { status: 500}
+        )
+    }
+    
 }
 
   
