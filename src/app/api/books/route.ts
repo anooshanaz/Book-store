@@ -134,23 +134,12 @@ export type Book = {
       },
     ]
 
+    export function getBooks(): Book[] {
+  return books;
+}
 
+export async function GET() {
+  return NextResponse.json(books);
+}
 
-export function getBooks(): Book[] {
-    return books;
-  }
-  
-  export async function GET() {
-    return NextResponse.json(books);
-  }
-  
-  export async function POST(request: NextRequest) {
-    try {
-      const newBook: Book = await request.json();
-      books.push(newBook);
-      return NextResponse.json({ message: "Book added successfully", book: newBook }, { status: 201 });
-    } catch (error) {
-      return NextResponse.json({ message: `Failed to add book: ${error}` }, { status: 500 });
-    }
-  }
   
